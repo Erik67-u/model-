@@ -2,6 +2,7 @@ import streamlit as st
 from keras.models import load_model
 from PIL import Image, ImageOps
 import numpy as np
+import os
 
 # ----------------------
 # Setup
@@ -10,20 +11,37 @@ st.set_page_config(page_title="Fundbüro Bild-Erkennung", page_icon="🔍")
 st.title("🔍 Fundbüro KI Bild-Erkennung")
 st.write("Lade ein Bild hoch, und die KI zeigt dir, welchem Fundstück es am ähnlichsten ist.")
 
+# ----------------------
+# Pfade zum Modell und zu den Labels
+# ----------------------
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # Ordner, in dem dieses Skript liegt
+MODEL_PATH = os.path.join(BASE_DIR, "keras_Model.h5")
+LABELS_PATH = os.path.join(BASE_DIR, "labels.txt")
+
+# ----------------------
 # Lade das Modell
+# ----------------------
 @st.cache_resource
-def load_ki_model():
-    return load_model("keras_Model.h5", compile=False)
+def load_ki_model(model_path):
+    if not os.path.exists(model_path):
+        st.error(f"Fehler: Modell-Datei nicht gefunden unter {model_path}")
+        st.stop()
+    return load_model(model_path, compile=False)
 
-model = load_ki_model()
+model = load_ki_model(MODEL_PATH)
 
+# ----------------------
 # Lade Labels
+# ----------------------
 @st.cache_data
-def load_labels():
-    with open("labels.txt", "r") as f:
+def load_labels(labels_path):
+    if not os.path.exists(labels_path):
+        st.error(f"Fehler: Labels-Datei nicht gefunden unter {labels_path}")
+        st.stop()
+    with open(labels_path, "r") as f:
         return [line.strip() for line in f.readlines()]
 
-class_names = load_labels()
+class_names = load_labels(LABELS_PATH)
 
 # ----------------------
 # Bild-Upload
