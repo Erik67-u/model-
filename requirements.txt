@@ -1,6 +1,5 @@
-streamlit
-tensorflow==2.14.0
-keras==2.14.0
-numpy
+streamlit==1.32.0
+tensorflow==2.15.0
+numpy==1.26.4
 pillow
-h5py
+h5py==3.10.0
